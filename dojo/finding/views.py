@@ -42,7 +42,7 @@ from dojo.utils import get_page_items, add_breadcrumb, FileIterWrapper, process_
     get_system_setting, apply_cwe_to_template, Product_Tab, calculate_grade, log_jira_alert, \
     redirect_to_return_url_or_else, get_return_url, add_jira_issue, update_jira_issue, add_external_issue, update_external_issue, \
     jira_get_issue, get_words_for_field
-from dojo.notifications.helper import create_notification
+from dojo.notifications.helper import create_notification, send_custom_msteams_notification
 
 from dojo.tasks import add_jira_issue_task, update_external_issue_task, add_comment_task, \
     add_external_issue_task, close_external_issue_task, reopen_external_issue_task
@@ -402,6 +402,13 @@ def close_finding(request, fid):
                                     description='The finding "%s" was closed by %s' % (finding.title, request.user),
                                     url=request.build_absolute_uri(reverse('view_test', args=(finding.test.id, ))),
                                     )
+
+                send_custom_msteams_notification(finding.test.engagement.product, event='other',
+                                    title='Closing of %s' % finding.title,
+                                    description='The finding "%s" was closed by %s' % (finding.title, request.user),
+                                    url=request.build_absolute_uri(reverse('view_test', args=(finding.test.id, ))),
+                                    )
+
                 return HttpResponseRedirect(
                     reverse('view_test', args=(finding.test.id, )))
             else:
@@ -529,6 +536,13 @@ def reopen_finding(request, fid):
                         description='The finding "%s" was reopened by %s' % (finding.title, request.user),
                         url=request.build_absolute_uri(reverse('view_test', args=(finding.test.id, ))),
                         )
+
+    send_custom_msteams_notification(finding.test.engagement.product, event='other',
+                        title='Reopening of %s' % finding.title,
+                        description='The finding "%s" was reopened by %s' % (finding.title, request.user),
+                        url=request.build_absolute_uri(reverse('view_test', args=(finding.test.id, ))),
+                        )
+
     return HttpResponseRedirect(reverse('view_finding', args=(finding.id, )))
 
 
@@ -582,6 +596,15 @@ def delete_finding(request, fid):
                                 url=request.build_absolute_uri(reverse('all_findings')),
                                 recipients=[finding.test.engagement.lead],
                                 icon="exclamation-triangle")
+
+            send_custom_msteams_notification(finding.test.engagement.product, event='other',
+                                title='Deletion of %s' % finding.title,
+                                description='The finding "%s" was deleted by %s' % (finding.title, request.user),
+                                url=request.build_absolute_uri(reverse('all_findings')),
+                                recipients=[finding.test.engagement.lead],
+                                icon="exclamation-triangle")
+
+
             return redirect_to_return_url_or_else(request, reverse('view_test', args=(tid,)))
         else:
             messages.add_message(
@@ -889,6 +912,12 @@ def request_finding_review(request, fid):
             reviewers = reviewers[:-2]
 
             create_notification(event='review_requested',
+                                title='Finding review requested',
+                                description='User %s has requested that users %s review the finding "%s" for accuracy:\n\n%s' % (user, reviewers, finding.title, new_note),
+                                icon='check',
+                                url=reverse("view_finding", args=(finding.id,)))
+
+            send_custom_msteams_notification(finding.test.engagement.product, event='review_requested',
                                 title='Finding review requested',
                                 description='User %s has requested that users %s review the finding "%s" for accuracy:\n\n%s' % (user, reviewers, finding.title, new_note),
                                 icon='check',

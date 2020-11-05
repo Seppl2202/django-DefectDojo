@@ -10,7 +10,7 @@ from dojo.forms import ImportScanForm, SEVERITY_CHOICES
 from dojo.tools import requires_file
 from dojo.tools.factory import import_parser_factory
 from dojo.utils import max_safe, is_scan_file_too_large
-from dojo.notifications.helper import create_notification
+from dojo.notifications.helper import create_notification, send_custom_msteams_notification
 from django.urls import reverse
 from tagging.models import Tag
 from django.core.validators import URLValidator, validate_ipv46_address
@@ -1052,10 +1052,17 @@ class ImportScanSerializer(TaggitSerializer, serializers.Serializer):
         create_notification(event='test_added', title=title, test=test, engagement=test.engagement, product=test.engagement.product,
                             url=reverse('view_test', args=(test.id,)))
 
+        send_custom_msteams_notification(test.engagement.product, event='test_added', title=title, test=test, engagement=test.engagement, product=test.engagement.product,
+                            url=reverse('view_test', args=(test.id,)))
+
         updated_count = len(new_findings) + len(old_findings)
         if updated_count > 0:
             title = 'Created ' + str(updated_count) + " findings for " + str(test.engagement.product) + ': ' + str(test.engagement.name) + ': ' + str(test)
             create_notification(initiator=self.context['request'].user, event='scan_added', title=title, findings_new=new_findings, findings_mitigated=old_findings,
+                                finding_count=updated_count, test=test, engagement=test.engagement, product=test.engagement.product,
+                                url=reverse('view_test', args=(test.id,)))
+
+            send_custom_msteams_notification(test.engagement.product, initiator=self.context['request'].user, event='scan_added', title=title, findings_new=new_findings, findings_mitigated=old_findings,
                                 finding_count=updated_count, test=test, engagement=test.engagement, product=test.engagement.product,
                                 url=reverse('view_test', args=(test.id,)))
 
@@ -1304,6 +1311,10 @@ class ReImportScanSerializer(TaggitSerializer, serializers.Serializer):
                 # new_items = original_items
                 title = 'Updated ' + str(updated_count) + " findings for " + str(test.engagement.product) + ': ' + str(test.engagement.name) + ': ' + str(test)
                 create_notification(initiator=self.context['request'].user, event='scan_added', title=title, findings_new=new_items, findings_mitigated=mitigated_findings, findings_reactivated=reactivated_items,
+                                    finding_count=updated_count, test=test, engagement=test.engagement, product=test.engagement.product, findings_untouched=untouched,
+                                    url=reverse('view_test', args=(test.id,)))
+
+                send_custom_msteams_notification(test.engagement.product, initiator=self.context['request'].user, event='scan_added', title=title, findings_new=new_items, findings_mitigated=mitigated_findings, findings_reactivated=reactivated_items,
                                     finding_count=updated_count, test=test, engagement=test.engagement, product=test.engagement.product, findings_untouched=untouched,
                                     url=reverse('view_test', args=(test.id,)))
 

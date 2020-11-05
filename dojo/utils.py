@@ -32,7 +32,7 @@ from dojo.models import Finding, Engagement, Finding_Template, Product, JIRA_PKe
     Language_Type, Languages, Rule, Notes
 from asteval import Interpreter
 from requests.auth import HTTPBasicAuth
-from dojo.notifications.helper import create_notification
+from dojo.notifications.helper import create_notification, send_custom_msteams_notification
 import logging
 import itertools
 from django.contrib import messages
@@ -1270,10 +1270,30 @@ def log_jira_alert(error, finding):
         source='JIRA update',
         finding=finding)
 
+    send_custom_msteams_notification(finding.test.engagement.product,
+        event='jira_update',
+        title='JIRA update issue' + '(' + truncate_with_dots(prod_name, 25) + ')',
+        description='Finding: ' + str(finding.id if finding else 'unknown') + ', ' + error,
+        url=reverse('view_finding', args=(finding.id, )) if finding else None,
+        icon='bullseye',
+        source='JIRA update',
+        finding=finding)
+
+
+    
+
 
 # Displays an alert for Jira notifications
 def log_jira_message(text, finding):
     create_notification(
+        event='jira_update',
+        title='Jira update message',
+        description=text + " Finding: " + str(finding.id),
+        url=reverse('view_finding', args=(finding.id, )),
+        icon='bullseye',
+        source='JIRA', finding=finding)
+
+    send_custom_msteams_notification(finding.test.engagement.product,
         event='jira_update',
         title='Jira update message',
         description=text + " Finding: " + str(finding.id),
@@ -2097,6 +2117,9 @@ def engagement_post_Save(sender, instance, created, **kwargs):
         engagement = instance
         title = 'Engagement created for ' + str(engagement.product) + ': ' + str(engagement.name)
         create_notification(event='engagement_added', title=title, engagement=engagement, product=engagement.product,
+                            url=reverse('view_engagement', args=(engagement.id,)))
+
+        send_custom_msteams_notification(engagement.product, event='engagement_added', title=title, engagement=engagement,
                             url=reverse('view_engagement', args=(engagement.id,)))
 
 

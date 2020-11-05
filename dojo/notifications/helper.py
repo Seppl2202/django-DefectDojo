@@ -23,7 +23,7 @@ def create_notification(event=None, *args, **kwargs):
         logger.debug('creating system notifications for event: %s', event)
         # send system notifications to all admin users
 
-        # System notifications
+        # System notifications‚
         try:
             system_notifications = Notifications.objects.get(user=None)
         except Exception:
@@ -206,16 +206,16 @@ def send_slack_notification(event, user=None, *args, **kwargs):
 
 
 @app.task(name='send_msteams_notification')
-def send_msteams_notification(event, user=None, *args, **kwargs):
+def send_msteams_notification(msteamsurl, event, user=None, *args, **kwargs):
     from dojo.utils import get_system_setting
 
     try:
         # Microsoft Teams doesn't offer direct message functionality, so no MS Teams PM functionality here...
         if user is None:
-            if get_system_setting('msteams_url') is not None:
+            if msteamsurl is not None:
                 res = requests.request(
                     method='POST',
-                    url=get_system_setting('msteams_url'),
+                    url=msteamsurl,
                     data=create_notification_message(event, None, 'msteams', *args, **kwargs))
                 if res.status_code != 200:
                     logger.error("Error when sending message to Microsoft Teams")
@@ -228,6 +228,26 @@ def send_msteams_notification(event, user=None, *args, **kwargs):
         logger.exception(e)
         log_alert(e, "Microsoft Teams Notification", title=kwargs['title'], description=str(e), url=kwargs['url'])
         pass
+
+
+def send_custom_msteams_notification(product, event, *args, **kwargs):
+    if not product is None and product.msteamsenabled:
+        try:
+            res = requests.request(
+                method='POST',
+                url=product.msteams,
+                data=create_notification_message(event, None, 'msteams', *args, **kwargs))
+            if res.status_code != 200:
+                logger.error("Error when sending message to Microsoft Teams")
+                logger.error(res.status_code)
+                logger.error(res.text)
+                raise RuntimeError('Error posting message to Microsoft Teams: ' + res.text)
+        except Exception as e:
+            logger.exception(e)
+            log_alert(e, "Microsoft Teams Notification", title=kwargs['title'], description=str(e), url=kwargs['url'])
+            pass      
+
+
 
 
 @app.task(name='send_mail_notification')

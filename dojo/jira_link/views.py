@@ -20,7 +20,7 @@ import requests
 from dojo.forms import JIRAForm, DeleteJIRAConfForm, ExpressJIRAForm
 from dojo.models import User, JIRA_Conf, JIRA_Issue, Notes, Risk_Acceptance
 from dojo.utils import add_breadcrumb, get_system_setting
-from dojo.notifications.helper import create_notification
+from dojo.notifications.helper import create_notification, send_custom_msteams_notification
 
 logger = logging.getLogger(__name__)
 
@@ -110,6 +110,8 @@ def webhook(request):
             finding.jira_change = timezone.now()
             finding.save()
             create_notification(event='other', title='JIRA Update - %s' % (jissue.finding), url=reverse("view_finding", args=(jissue.id,)), icon='check')
+            send_custom_msteams_notification(finding.test.engagement.product, event='other', title='JIRA Update - %s' % (jissue.finding), url=reverse("view_finding", args=(jissue.id,)), icon='check')
+            
 
         if parsed.get('webhookEvent') not in ['comment_created', 'jira:issue_updated']:
             logger.info('Unrecognized JIRA webhook event received: {}'.format(parsed.get('webhookEvent')))

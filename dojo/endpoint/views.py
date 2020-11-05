@@ -19,7 +19,7 @@ from dojo.forms import EditEndpointForm, \
     DeleteEndpointForm, AddEndpointForm, DojoMetaDataForm
 from dojo.models import Product, Endpoint, Finding, System_Settings, DojoMeta, Endpoint_Status
 from dojo.utils import get_page_items, add_breadcrumb, get_period_counts, get_system_setting, Product_Tab, calculate_grade
-from dojo.notifications.helper import create_notification
+from dojo.notifications.helper import create_notification, send_custom_msteams_notification
 from dojo.user.helper import user_must_be_authorized
 
 
@@ -235,6 +235,13 @@ def delete_endpoint(request, eid):
                                     description='The endpoint "%s" was deleted by %s' % (endpoint, request.user),
                                     url=request.build_absolute_uri(reverse('endpoints')),
                                     icon="exclamation-triangle")
+
+                send_custom_msteams_notification(endpoint.product, event='other',
+                                    title='Deletion of %s' % endpoint,
+                                    description='The endpoint "%s" was deleted by %s' % (endpoint, request.user),
+                                    url=request.build_absolute_uri(reverse('endpoints')),
+                                    icon="exclamation-triangle")
+                
                 return HttpResponseRedirect(reverse('view_product', args=(product.id,)))
 
     collector = NestedObjects(using=DEFAULT_DB_ALIAS)

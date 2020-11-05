@@ -5,7 +5,7 @@ import json
 from django.urls import reverse
 from django.utils import timezone
 
-from dojo.notifications.helper import create_notification
+from dojo.notifications.helper import create_notification, send_custom_msteams_notification
 from dojo.forms import Tag
 from dojo.models import Test, Test_Type, Development_Environment, Objects_Engagement, \
                         Objects, Objects_Review
@@ -107,6 +107,7 @@ def import_object_eng(request, engagement, json_data):
     # Create the notification
     if create_alert:
         create_notification(event='code_review', title='Manual Code Review Requested', description="Manual code review requested as tracked file changes were found in the latest build.", engagement=engagement, url=reverse('view_object_eng', args=(engagement.id,)))
+        send_custom_msteams_notification(engagement.product, event='code_review', title='Manual Code Review Requested', description="Manual code review requested as tracked file changes were found in the latest build.", engagement=engagement, url=reverse('view_object_eng', args=(engagement.id,)))
 
     # Create the test within the engagement
     if create_test_code_review:
@@ -117,3 +118,4 @@ def import_object_eng(request, engagement, json_data):
                      target_end=timezone.now() + timezone.timedelta(days=1), environment=environment, percent_complete=0)
             test.save()
             create_notification(event='test_added', title='Test added for Manual Code Review', test=test, engagement=engagement, url=request.build_absolute_uri(reverse('view_engagement', args=(engagement.id,))))
+            send_custom_msteams_notification(engagement.product, event='test_added', title='Test added for Manual Code Review', test=test, engagement=engagement, url=request.build_absolute_uri(reverse('view_engagement', args=(engagement.id,))))

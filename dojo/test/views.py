@@ -31,7 +31,7 @@ from dojo.models import Finding, Test, Notes, Note_Type, BurpRawRequestResponse,
 from dojo.tools.factory import import_parser_factory
 from dojo.utils import get_page_items, get_page_items_and_count, add_breadcrumb, get_cal_event, message, process_notifications, get_system_setting, \
     Product_Tab, max_safe, is_scan_file_too_large, add_jira_issue, get_words_for_field
-from dojo.notifications.helper import create_notification
+from dojo.notifications.helper import create_notification, send_custom_msteams_notification
 from dojo.tasks import add_jira_issue_task
 from dojo.finding.views import find_available_notetypes
 from functools import reduce
@@ -237,6 +237,15 @@ def delete_test(request, tid):
                                     url=request.build_absolute_uri(reverse('view_engagement', args=(eng.id, ))),
                                     recipients=[test.engagement.lead],
                                     icon="exclamation-triangle")
+
+                send_custom_msteams_notification(test.engagement.product, event='other',
+                                    title='Deletion of %s' % test.title,
+                                    description='The test "%s" was deleted by %s' % (test.title, request.user),
+                                    url=request.build_absolute_uri(reverse('view_engagement', args=(eng.id, ))),
+                                    recipients=[test.engagement.lead],
+                                    icon="exclamation-triangle")
+
+                
                 return HttpResponseRedirect(reverse('view_engagement', args=(eng.id,)))
 
     collector = NestedObjects(using=DEFAULT_DB_ALIAS)
@@ -403,6 +412,12 @@ def add_findings(request, tid):
 
             new_finding.save(false_history=True, push_to_jira=push_to_jira)
             create_notification(event='other',
+                                title='Addition of %s' % new_finding.title,
+                                description='Finding "%s" was added by %s' % (new_finding.title, request.user),
+                                url=request.build_absolute_uri(reverse('view_finding', args=(new_finding.id,))),
+                                icon="exclamation-triangle")
+
+            send_custom_msteams_notification(test.engagement.product, event='other',
                                 title='Addition of %s' % new_finding.title,
                                 description='Finding "%s" was added by %s' % (new_finding.title, request.user),
                                 url=request.build_absolute_uri(reverse('view_finding', args=(new_finding.id,))),
@@ -902,6 +917,7 @@ def re_import_scan_results(request, tid):
                                          extra_tags='alert-success')
 
                 create_notification(event='scan_added', title=str(finding_count) + " findings for " + test.engagement.product.name, finding_count=finding_count, test=test, engagement=test.engagement, url=reverse('view_test', args=(test.id,)))
+                send_custom_msteams_notification(test.engagement.product, event='scan_added', title=str(finding_count) + " findings for " + test.engagement.product.name, finding_count=finding_count, test=test, engagement=test.engagement, url=reverse('view_test', args=(test.id,)))
 
                 return HttpResponseRedirect(reverse('view_test', args=(test.id,)))
             except SyntaxError:

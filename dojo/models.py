@@ -616,6 +616,8 @@ class Product(models.Model):
     )
 
     name = models.CharField(max_length=255, unique=True)
+    msteamsenabled = models.BooleanField(default=False, help_text=('Specify if push notifications are enabled for this product.'))
+    msteams = models.CharField(max_length=255, unique=False, null=True)
     description = models.CharField(max_length=4000)
 
     '''

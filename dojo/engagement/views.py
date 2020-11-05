@@ -33,7 +33,7 @@ from dojo.tools import handles_active_verified_statuses
 from dojo.tools.factory import import_parser_factory
 from dojo.utils import get_page_items, add_breadcrumb, handle_uploaded_threat, \
     FileIterWrapper, get_cal_event, message, get_system_setting, Product_Tab, is_scan_file_too_large, update_epic, add_epic
-from dojo.notifications.helper import create_notification
+from dojo.notifications.helper import create_notification, send_custom_msteams_notification
 from dojo.tasks import update_epic_task, add_epic_task
 from dojo.finding.views import find_available_notetypes
 from functools import reduce
@@ -276,6 +276,13 @@ def delete_engagement(request, eid):
                                     recipients=[engagement.lead],
                                     icon="exclamation-triangle")
 
+                send_custom_msteams_notification(engagement.product, event='other',
+                                    title='Deletion of %s' % engagement.name,
+                                    description='The engagement "%s" was deleted by %s' % (engagement.name, request.user),
+                                    url=request.build_absolute_uri(reverse('view_engagements', args=(product.id, ))),
+                                    recipients=[engagement.lead],
+                                    icon="exclamation-triangle")
+
                 if engagement.engagement_type == 'CI/CD':
                     return HttpResponseRedirect(reverse("view_engagements_cicd", args=(product.id, )))
                 else:
@@ -488,6 +495,13 @@ def add_tests(request, eid):
                 extra_tags='alert-success')
 
             create_notification(
+                event='test_added',
+                title=new_test.test_type.name + " for " + eng.product.name,
+                test=new_test,
+                engagement=eng,
+                url=reverse('view_engagement', args=(eng.id, )))
+
+            send_custom_msteams_notification(eng.product,
                 event='test_added',
                 title=new_test.test_type.name + " for " + eng.product.name,
                 test=new_test,
@@ -752,6 +766,15 @@ def import_scan_results(request, eid=None, pid=None):
                     engagement=engagement,
                     url=reverse('view_test', args=(t.id, )))
 
+                send_custom_msteams_notification(engagement.product,
+                    initiator=user,
+                    event='scan_added',
+                    title=str(finding_count) + " findings for " + engagement.product.name,
+                    finding_count=finding_count,
+                    test=t,
+                    engagement=engagement,
+                    url=reverse('view_test', args=(t.id, )))
+
                 return HttpResponseRedirect(
                     reverse('view_test', args=(t.id, )))
             except SyntaxError:
@@ -796,6 +819,12 @@ def close_eng(request, eid):
                         title='Closure of %s' % eng.name,
                         description='The engagement "%s" was closed' % (eng.name),
                         url=request.build_absolute_uri(reverse('view_engagements', args=(eng.product.id, ))),)
+
+    send_custom_msteams_notification(eng.product, event='other',
+                        title='Closure of %s' % eng.name,
+                        description='The engagement "%s" was closed' % (eng.name),
+                        url=request.build_absolute_uri(reverse('view_engagements', args=(eng.product.id, ))),)
+
     if eng.engagement_type == 'CI/CD':
         return HttpResponseRedirect(reverse("view_engagements_cicd", args=(eng.product.id, )))
     else:
@@ -815,6 +844,12 @@ def reopen_eng(request, eid):
                         title='Reopening of %s' % eng.name,
                         description='The engagement "%s" was reopened' % (eng.name),
                         url=request.build_absolute_uri(reverse('view_engagements', args=(eng.product.id, ))),)
+
+    send_custom_msteams_notification(eng.product, event='other',
+                        title='Reopening of %s' % eng.name,
+                        description='The engagement "%s" was reopened' % (eng.name),
+                        url=request.build_absolute_uri(reverse('view_engagements', args=(eng.product.id, ))),)
+                        
     if eng.engagement_type == 'CI/CD':
         return HttpResponseRedirect(reverse("view_engagements_cicd", args=(eng.product.id, )))
     else:

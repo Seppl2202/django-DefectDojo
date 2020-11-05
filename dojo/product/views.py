@@ -27,7 +27,7 @@ from dojo.models import Product_Type, Note_Type, Finding, Product, Engagement, S
                         Endpoint, Engagement_Presets, DojoMeta, Sonarqube_Product, Notifications, Dojo_User, BurpRawRequestResponse
 
 from dojo.utils import get_page_items, add_breadcrumb, get_system_setting, Product_Tab, get_punchcard_data, add_epic, queryset_check
-from dojo.notifications.helper import create_notification
+from dojo.notifications.helper import create_notification, send_custom_msteams_notification
 from custom_field.models import CustomFieldValue, CustomField
 from dojo.tasks import add_epic_task, add_external_issue_task, add_external_issue
 from tagging.models import Tag
@@ -715,6 +715,7 @@ def new_product(request):
                 sonarqube_product.save()
 
             create_notification(event='product_added', title=product.name, url=reverse('view_product', args=(product.id,)))
+            send_custom_msteams_notification(product, event='product_added', title=product.name, url=reverse('view_product', args=(product.id,)))
             return HttpResponseRedirect(reverse('view_product', args=(product.id,)))
     else:
         form = ProductForm()
@@ -747,6 +748,7 @@ def edit_product(request, pid):
     github_inst = None
     gform = None
     sonarqube_form = None
+    msteams = None
     try:
         jira_inst = JIRA_PKey.objects.get(product=prod)
     except:
@@ -878,6 +880,13 @@ def delete_product(request, pid):
                                     description='The product "%s" was deleted by %s' % (product.name, request.user),
                                     url=request.build_absolute_uri(reverse('product')),
                                     icon="exclamation-triangle")
+
+                send_custom_msteams_notification(product, event='other',
+                                    title='Deletion of %s' % product.name,
+                                    description='The product "%s" was deleted by %s' % (product.name, request.user),
+                                    url=request.build_absolute_uri(reverse('product')),
+                                    icon="exclamation-triangle")
+
                 return HttpResponseRedirect(reverse('product'))
 
     collector = NestedObjects(using=DEFAULT_DB_ALIAS)
@@ -948,6 +957,7 @@ def new_eng_for_app(request, pid, cicd=False):
                                  extra_tags='alert-success')
 
             create_notification(event='engagement_added', title=new_eng.name + " for " + prod.name, engagement=new_eng, url=reverse('view_engagement', args=(new_eng.id,)), objowner=new_eng.lead)
+            send_custom_msteams_notification(new_eng.product, event='engagement added', custom_url=prod.msteams, title=new_eng.name + " for " + prod.name, engagement=new_eng, url=reverse('view_engagement', args=(new_eng.id,)), objowner=new_eng.lead)
 
             if "_Add Tests" in request.POST:
                 return HttpResponseRedirect(reverse('add_tests', args=(new_eng.id,)))

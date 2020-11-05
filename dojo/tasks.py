@@ -21,7 +21,7 @@ from dojo.utils import add_comment, add_epic, add_jira_issue, update_epic, \
                        close_epic, sync_rules, \
                        update_external_issue, add_external_issue, \
                        close_external_issue, reopen_external_issue, sla_compute_and_notify
-from dojo.notifications.helper import create_notification
+from dojo.notifications.helper import create_notification, send_custom_msteams_notification
 import logging
 
 fmt = getattr(settings, 'LOG_FORMAT', None)
@@ -49,6 +49,12 @@ def add_alerts(self, runinterval):
                             engagement=engagement,
                             recipients=[engagement.lead],
                             url=reverse('view_engagement', args=(engagement.id,)))
+        
+        send_custom_msteams_notification(engagement.product, event='upcoming_engagement',
+                            title='Upcoming engagement: %s' % engagement.name,
+                            engagement=engagement,
+                            recipients=[engagement.lead],
+                            url=reverse('view_engagement', args=(engagement.id,)))
 
     stale_engagements = Engagement.objects.filter(
         target_start__gt=now - runinterval,
@@ -56,6 +62,12 @@ def add_alerts(self, runinterval):
         status='In Progress').order_by('-target_end')
     for eng in stale_engagements:
         create_notification(event='stale_engagement',
+                            title='Stale Engagement: %s' % eng.name,
+                            description='The engagement "%s" is stale. Target end was %s.' % (eng.name, eng.target_end.strftime("%b. %d, %Y")),
+                            url=reverse('view_engagement', args=(eng.id,)),
+                            recipients=[eng.lead])
+
+        send_custom_msteams_notification(eng.product, event='stale_engagement',
                             title='Stale Engagement: %s' % eng.name,
                             description='The engagement "%s" is stale. Target end was %s.' % (eng.name, eng.target_end.strftime("%b. %d, %Y")),
                             url=reverse('view_engagement', args=(eng.id,)),
@@ -70,6 +82,12 @@ def add_alerts(self, runinterval):
 
         for eng in unclosed_engagements:
             create_notification(event='auto_close_engagement',
+                                title=eng.name,
+                                description='The engagement "%s" has auto-closed. Target end was %s.' % (eng.name, eng.target_end.strftime("%b. %d, %Y")),
+                                url=reverse('view_engagement', args=(eng.id,)),
+                                recipients=[eng.lead])
+
+            send_custom_msteams_notification(eng.product, event='auto_close_engagement',
                                 title=eng.name,
                                 description='The engagement "%s" has auto-closed. Target end was %s.' % (eng.name, eng.target_end.strftime("%b. %d, %Y")),
                                 url=reverse('view_engagement', args=(eng.id,)),
