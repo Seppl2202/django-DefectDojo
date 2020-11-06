@@ -276,7 +276,7 @@ def delete_engagement(request, eid):
                                     recipients=[engagement.lead],
                                     icon="exclamation-triangle")
 
-                send_custom_msteams_notification(engagement.product, event='other',
+                send_custom_msteams_notification(engagement.product, event='engagement_delete',
                                     title='Deletion of %s' % engagement.name,
                                     description='The engagement "%s" was deleted by %s' % (engagement.name, request.user),
                                     url=request.build_absolute_uri(reverse('view_engagements', args=(product.id, ))),
@@ -820,7 +820,7 @@ def close_eng(request, eid):
                         description='The engagement "%s" was closed' % (eng.name),
                         url=request.build_absolute_uri(reverse('view_engagements', args=(eng.product.id, ))),)
 
-    send_custom_msteams_notification(eng.product, event='other',
+    send_custom_msteams_notification(eng.product, event='engagement_close',
                         title='Closure of %s' % eng.name,
                         description='The engagement "%s" was closed' % (eng.name),
                         url=request.build_absolute_uri(reverse('view_engagements', args=(eng.product.id, ))),)

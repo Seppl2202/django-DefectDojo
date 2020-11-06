@@ -231,7 +231,11 @@ def send_msteams_notification(msteamsurl, event, user=None, *args, **kwargs):
 
 
 def send_custom_msteams_notification(product, event, *args, **kwargs):
-    if not product is None and product.msteamsenabled:
+    pass
+    should_notify = should_notify_product_spefific_notification_channels(product, event)
+    logger.info('Should notify?')
+    logger.info(should_notify)
+    if not product is None and product.msteamsenabled and should_notify:
         try:
             res = requests.request(
                 method='POST',
@@ -248,6 +252,19 @@ def send_custom_msteams_notification(product, event, *args, **kwargs):
             pass      
 
 
+def should_notify_product_spefific_notification_channels(product, event):
+
+    if product.notification_engagement_add and event =='engagement_added':
+        logger.info('engagement add')
+        return True
+    if product.notification_engagement_delete and event == 'engagement_delete':
+        logger.info('engagement delete')
+        return True
+    if product.notification_test_added and event == 'test_added':
+        logger.info('test added ')
+        return True
+    logger.info('None of them, returning false')
+    return False
 
 
 @app.task(name='send_mail_notification')

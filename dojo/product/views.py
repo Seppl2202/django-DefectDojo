@@ -21,7 +21,7 @@ from dojo.templatetags.display_tags import get_level
 from dojo.filters import ProductFilter, EngagementFilter, ProductMetricsEndpointFilter, ProductMetricsFindingFilter, ProductComponentFilter
 from dojo.forms import ProductForm, EngForm, DeleteProductForm, DojoMetaDataForm, JIRAPKeyForm, JIRAFindingForm, AdHocFindingForm, \
                        EngagementPresetsForm, DeleteEngagementPresetsForm, Sonarqube_ProductForm, ProductNotificationsForm, \
-                       GITHUB_Product_Form, GITHUBFindingForm, App_AnalysisTypeForm, JIRAEngagementForm
+                       GITHUB_Product_Form, GITHUBFindingForm, App_AnalysisTypeForm, JIRAEngagementForm, PNotificationForm
 from dojo.models import Product_Type, Note_Type, Finding, Product, Engagement, ScanSettings, Risk_Acceptance, Test, JIRA_PKey, GITHUB_PKey, Finding_Template, \
                         Test_Type, System_Settings, Languages, App_Analysis, Benchmark_Type, Benchmark_Product_Summary, Endpoint_Status, \
                         Endpoint, Engagement_Presets, DojoMeta, Sonarqube_Product, Notifications, Dojo_User, BurpRawRequestResponse
@@ -736,6 +736,24 @@ def new_product(request):
                    'sonarqube_form': Sonarqube_ProductForm()})
 
 
+
+def edit_product_notifications(request, pid):
+    prod = Product.objects.get(pk=pid)
+    logger.info('Editing product')
+    logger.info(prod.name)
+    if request.method == 'POST':
+        pnotification = PNotificationForm(request.POST, instance=prod)
+        
+    else:
+        pnotification = PNotificationForm()
+    
+    return render(request,
+                  'dojo/edit_product_notifications.html',
+                  {'form': pnotification,
+                   'product': prod
+                   })
+
+
 # @user_passes_test(lambda u: u.is_staff)
 @user_must_be_authorized(Product, 'staff', 'pid')
 def edit_product(request, pid):
@@ -764,6 +782,7 @@ def edit_product(request, pid):
 
     if request.method == 'POST':
         form = ProductForm(request.POST, instance=prod)
+        pnotification = PNotificationForm(request.POST, instance=prod)
         if form.is_valid():
             form.save()
             tags = request.POST.getlist('tags')
@@ -773,6 +792,8 @@ def edit_product(request, pid):
                                  messages.SUCCESS,
                                  'Product updated successfully.',
                                  extra_tags='alert-success')
+
+            
 
             if get_system_setting('enable_jira') and jira_inst:
                 jform = JIRAPKeyForm(request.POST, instance=jira_inst)
@@ -957,7 +978,6 @@ def new_eng_for_app(request, pid, cicd=False):
                                  extra_tags='alert-success')
 
             create_notification(event='engagement_added', title=new_eng.name + " for " + prod.name, engagement=new_eng, url=reverse('view_engagement', args=(new_eng.id,)), objowner=new_eng.lead)
-            send_custom_msteams_notification(new_eng.product, event='engagement added', custom_url=prod.msteams, title=new_eng.name + " for " + prod.name, engagement=new_eng, url=reverse('view_engagement', args=(new_eng.id,)), objowner=new_eng.lead)
 
             if "_Add Tests" in request.POST:
                 return HttpResponseRedirect(reverse('add_tests', args=(new_eng.id,)))

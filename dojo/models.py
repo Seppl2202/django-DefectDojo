@@ -45,7 +45,6 @@ deduplicationLogger = logging.getLogger("dojo.specific-loggers.deduplication")
 class UniqueUploadNameProvider:
     """
     A callable to be passed as upload_to parameter to FileField.
-
     Uploaded files will get random names based on UUIDs inside the given directory;
     strftime-style formatting is supported within the directory path. If keep_basename
     is True, the original file name is prepended to the UUID. If keep_ext is disabled,
@@ -562,6 +561,15 @@ class DojoMeta(models.Model):
                            ('finding', 'name'))
 
 
+class PNotification(models.Model):
+    msteamsenabled = models.BooleanField(default=False, help_text=('Specify if push notifications are enabled for this product.'))
+    msteams = models.CharField(max_length=255, unique=False, null=True)
+    notification_engagement_add = models.BooleanField(default=False, help_text='Receive messages when an engagement is added')
+    notification_engagement_delete = models.BooleanField(default=False, help_text='Receive messages when an engagement is deleted')
+    notification_test_added = models.BooleanField(default=False, help_text='Receive messages when a test is added')
+
+
+
 class Product(models.Model):
     WEB_PLATFORM = 'web'
     IOT = 'iot'
@@ -616,15 +624,14 @@ class Product(models.Model):
     )
 
     name = models.CharField(max_length=255, unique=True)
-    msteamsenabled = models.BooleanField(default=False, help_text=('Specify if push notifications are enabled for this product.'))
-    msteams = models.CharField(max_length=255, unique=False, null=True)
+
+    
     description = models.CharField(max_length=4000)
 
     '''
     The following three fields are deprecated and no longer in use.
     They remain in model for backwards compatibility and will be removed
     in a future release.  prod_manager, tech_contact, manager
-
     The admin script migrate_product_contacts should be used to migrate data
     from these fields to their replacements.
     ./manage.py migrate_product_contacts

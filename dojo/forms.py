@@ -26,7 +26,7 @@ from dojo.models import Finding, Product_Type, Product, Note_Type, ScanSettings,
     Languages, Language_Type, App_Analysis, Objects, Benchmark_Product, Benchmark_Requirement, \
     Benchmark_Product_Summary, Rule, Child_Rule, Engagement_Presets, DojoMeta, Sonarqube_Product, \
     Engagement_Survey, Answered_Survey, TextAnswer, ChoiceAnswer, Choice, Question, TextQuestion, \
-    ChoiceQuestion, General_Survey, Regulation
+    ChoiceQuestion, General_Survey, Regulation, PNotification
 
 from dojo.tools import requires_file, SCAN_SONARQUBE_API
 from dojo.utils import jira_get_issue
@@ -188,6 +188,11 @@ class Delete_Dev_EnvironmentForm(forms.ModelForm):
         model = Development_Environment
         exclude = ['name']
 
+class PNotificationForm(forms.ModelForm):
+    class Meta:
+        model = PNotification
+        exclude = ['']
+
 
 class ProductForm(forms.ModelForm):
     name = forms.CharField(max_length=50, required=True)
@@ -212,8 +217,7 @@ class ProductForm(forms.ModelForm):
     product_manager = forms.ModelChoiceField(queryset=Dojo_User.objects.exclude(is_active=False).order_by('first_name', 'last_name'), required=False)
     technical_contact = forms.ModelChoiceField(queryset=Dojo_User.objects.exclude(is_active=False).order_by('first_name', 'last_name'), required=False)
     team_manager = forms.ModelChoiceField(queryset=Dojo_User.objects.exclude(is_active=False).order_by('first_name', 'last_name'), required=False)
-    msteamsenabled = forms.BooleanField(help_text='Specify if push notifications are enabled for this product.', required=False)
-    msteams = forms.CharField(max_length=500, required=False)
+
 
     def __init__(self, *args, **kwargs):
         non_staff = Dojo_User.objects.exclude(is_staff=True) \
@@ -226,8 +230,8 @@ class ProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        fields = ['name', 'description', 'tags', 'product_manager', 'technical_contact', 'team_manager', 'msteams', 'msteamsenabled' ,'prod_type', 'regulations', 'app_analysis',
-                  'authorized_users', 'business_criticality', 'platform', 'lifecycle', 'origin', 'user_records', 'revenue', 'external_audience', 'internet_accessible']
+        fields = ['name', 'description', 'tags', 'product_manager', 'technical_contact', 'team_manager', 'prod_type', 'regulations', 'app_analysis','authorized_users', 'business_criticality', 'platform',
+            'lifecycle', 'origin', 'user_records', 'revenue', 'external_audience', 'internet_accessible']
 
 
 class DeleteProductForm(forms.ModelForm):
@@ -240,7 +244,7 @@ class DeleteProductForm(forms.ModelForm):
                    'prod_type', 'updated', 'tid', 'authorized_users', 'product_manager',
                    'technical_contact', 'team_manager', 'prod_numeric_grade', 'business_criticality',
                    'platform', 'lifecycle', 'origin', 'user_records', 'revenue', 'external_audience',
-                   'internet_accessible', 'regulations', 'product_meta']
+                   'internet_accessible', 'regulations', 'product_meta', 'msteamsenabled', 'msteams']
 
 
 class NoteTypeForm(forms.ModelForm):
