@@ -403,7 +403,7 @@ def close_finding(request, fid):
                                     url=request.build_absolute_uri(reverse('view_test', args=(finding.test.id, ))),
                                     )
 
-                send_custom_msteams_notification(finding.test.engagement.product, event='other',
+                send_custom_msteams_notification(finding.test.engagement.product, event='finding_close',
                                     title='Closing of %s' % finding.title,
                                     description='The finding "%s" was closed by %s' % (finding.title, request.user),
                                     url=request.build_absolute_uri(reverse('view_test', args=(finding.test.id, ))),
@@ -537,7 +537,7 @@ def reopen_finding(request, fid):
                         url=request.build_absolute_uri(reverse('view_test', args=(finding.test.id, ))),
                         )
 
-    send_custom_msteams_notification(finding.test.engagement.product, event='other',
+    send_custom_msteams_notification(finding.test.engagement.product, event='finding_reopen',
                         title='Reopening of %s' % finding.title,
                         description='The finding "%s" was reopened by %s' % (finding.title, request.user),
                         url=request.build_absolute_uri(reverse('view_test', args=(finding.test.id, ))),
@@ -597,7 +597,7 @@ def delete_finding(request, fid):
                                 recipients=[finding.test.engagement.lead],
                                 icon="exclamation-triangle")
 
-            send_custom_msteams_notification(finding.test.engagement.product, event='other',
+            send_custom_msteams_notification(finding.test.engagement.product, event='finding_delete',
                                 title='Deletion of %s' % finding.title,
                                 description='The finding "%s" was deleted by %s' % (finding.title, request.user),
                                 url=request.build_absolute_uri(reverse('all_findings')),

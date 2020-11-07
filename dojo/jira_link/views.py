@@ -110,7 +110,7 @@ def webhook(request):
             finding.jira_change = timezone.now()
             finding.save()
             create_notification(event='other', title='JIRA Update - %s' % (jissue.finding), url=reverse("view_finding", args=(jissue.id,)), icon='check')
-            send_custom_msteams_notification(finding.test.engagement.product, event='other', title='JIRA Update - %s' % (jissue.finding), url=reverse("view_finding", args=(jissue.id,)), icon='check')
+            send_custom_msteams_notification(finding.test.engagement.product, event='jira_update', title='JIRA Update - %s' % (jissue.finding), url=reverse("view_finding", args=(jissue.id,)), icon='check')
             
 
         if parsed.get('webhookEvent') not in ['comment_created', 'jira:issue_updated']:

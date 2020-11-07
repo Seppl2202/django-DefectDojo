@@ -238,7 +238,7 @@ def delete_test(request, tid):
                                     recipients=[test.engagement.lead],
                                     icon="exclamation-triangle")
 
-                send_custom_msteams_notification(test.engagement.product, event='other',
+                send_custom_msteams_notification(test.engagement.product, event='test_delete',
                                     title='Deletion of %s' % test.title,
                                     description='The test "%s" was deleted by %s' % (test.title, request.user),
                                     url=request.build_absolute_uri(reverse('view_engagement', args=(eng.id, ))),
@@ -417,7 +417,7 @@ def add_findings(request, tid):
                                 url=request.build_absolute_uri(reverse('view_finding', args=(new_finding.id,))),
                                 icon="exclamation-triangle")
 
-            send_custom_msteams_notification(test.engagement.product, event='other',
+            send_custom_msteams_notification(test.engagement.product, event='finding_add',
                                 title='Addition of %s' % new_finding.title,
                                 description='Finding "%s" was added by %s' % (new_finding.title, request.user),
                                 url=request.build_absolute_uri(reverse('view_finding', args=(new_finding.id,))),

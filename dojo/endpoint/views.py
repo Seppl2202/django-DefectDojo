@@ -236,7 +236,7 @@ def delete_endpoint(request, eid):
                                     url=request.build_absolute_uri(reverse('endpoints')),
                                     icon="exclamation-triangle")
 
-                send_custom_msteams_notification(endpoint.product, event='other',
+                send_custom_msteams_notification(endpoint.product, event='endpoint_delete',
                                     title='Deletion of %s' % endpoint,
                                     description='The endpoint "%s" was deleted by %s' % (endpoint, request.user),
                                     url=request.build_absolute_uri(reverse('endpoints')),

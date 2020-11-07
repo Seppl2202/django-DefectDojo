@@ -845,7 +845,7 @@ def reopen_eng(request, eid):
                         description='The engagement "%s" was reopened' % (eng.name),
                         url=request.build_absolute_uri(reverse('view_engagements', args=(eng.product.id, ))),)
 
-    send_custom_msteams_notification(eng.product, event='other',
+    send_custom_msteams_notification(eng.product, event='engagement_reopen',
                         title='Reopening of %s' % eng.name,
                         description='The engagement "%s" was reopened' % (eng.name),
                         url=request.build_absolute_uri(reverse('view_engagements', args=(eng.product.id, ))),)

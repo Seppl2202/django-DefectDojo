@@ -757,7 +757,7 @@ def edit_product_notifications(request, pid):
 
     else:
         logger.info('Default form with initial values')
-        pnotification = PNotificationForm(request.POST, instance=notifications)
+        pnotification = PNotificationForm(instance=notifications)
         if pnotification.is_valid():
             pnotification.save()
             logger.info('saved')
@@ -923,7 +923,7 @@ def delete_product(request, pid):
                                     url=request.build_absolute_uri(reverse('product')),
                                     icon="exclamation-triangle")
 
-                send_custom_msteams_notification(product, event='other',
+                send_custom_msteams_notification(product, event='product_delete',
                                     title='Deletion of %s' % product.name,
                                     description='The product "%s" was deleted by %s' % (product.name, request.user),
                                     url=request.build_absolute_uri(reverse('product')),
