@@ -257,17 +257,47 @@ def send_custom_msteams_notification(product, event, *args, **kwargs):
             pass      
 
 
-def should_notify_product_spefific_notification_channels(product, event):
+def should_notify_product_spefific_notification_channels(notification, event):
 
-    if product.notification_engagement_add and event =='engagement_added':
-        logger.info('engagement add')
+    if notification.notification_engagement_add and event =='engagement_added':
         return True
-    if product.notification_engagement_delete and event == 'engagement_delete':
-        logger.info('engagement delete')
+    if notification.notification_engagement_delete and event == 'engagement_delete':
         return True
-    if product.notification_test_added and event == 'test_added':
-        logger.info('test added ')
+    if notification.notification_engagement_upcoming and event == 'engagement_upcoming':
         return True
+    if notification.notification_engagement_stale and event == 'engagement_stale':
+        return True
+    if notification.notification_engagement_close and event == 'engagement_close':
+        return True
+    if notification.notification_engagement_reopen and event == 'engagement_reopen':
+        return True
+    if notification.notification_engagement_auto_close and event == 'auto_close_engagement':
+        return True
+    if notification.notification_test_add and event == 'test_added':
+        return True
+    if notification.notification_test_delete and event == 'test_delete':
+        return True
+    if notification.notification_product_add and event == 'product_added':
+        return True
+    if notification.notification_product_delete and event == 'product_delete':
+        return True
+    if notification.notification_finding_add and event == 'finding_add':
+        return True
+    if notification.notification_finding_close and event == 'finding_close':
+        return True
+    if notification.notification_finding_delete and event == 'finding_delete':
+        return True
+    if notification.notification_finding_reopen and event == 'finding_reopen':
+        return True
+    if notification.notification_review_requested and event == 'review_requested':
+        return True
+    if notification.notification_review_codereview and event == 'code_review':
+        return True
+    if notification.notification_scan_add and event == 'scan_added':
+        return True
+    if notification.notification_jira_update and event == 'jira_update':
+        return True
+
     logger.info('None of them, returning false')
     return False
 
