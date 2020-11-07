@@ -24,7 +24,7 @@ from dojo.forms import ProductForm, EngForm, DeleteProductForm, DojoMetaDataForm
                        GITHUB_Product_Form, GITHUBFindingForm, App_AnalysisTypeForm, JIRAEngagementForm, PNotificationForm
 from dojo.models import Product_Type, Note_Type, Finding, Product, Engagement, ScanSettings, Risk_Acceptance, Test, JIRA_PKey, GITHUB_PKey, Finding_Template, \
                         Test_Type, System_Settings, Languages, App_Analysis, Benchmark_Type, Benchmark_Product_Summary, Endpoint_Status, \
-                        Endpoint, Engagement_Presets, DojoMeta, Sonarqube_Product, Notifications, Dojo_User, BurpRawRequestResponse
+                        Endpoint, Engagement_Presets, DojoMeta, Sonarqube_Product, Notifications, Dojo_User, BurpRawRequestResponse, PNotification
 
 from dojo.utils import get_page_items, add_breadcrumb, get_system_setting, Product_Tab, get_punchcard_data, add_epic, queryset_check
 from dojo.notifications.helper import create_notification, send_custom_msteams_notification
@@ -740,13 +740,35 @@ def new_product(request):
 def edit_product_notifications(request, pid):
     prod = Product.objects.get(pk=pid)
     logger.info('Editing product')
-    logger.info(prod.name)
+    notifications = PNotification.objects.filter(product_id= pid).first()
+
     if request.method == 'POST':
-        pnotification = PNotificationForm(request.POST, instance=prod)
-        
+        logger.info('Getting existing notifications')
+        pnotification = PNotificationForm(request.POST, instance=notifications)
+        if pnotification.is_valid():
+            pnotification.save()
+            logger.info('saved')
+            
+        else:
+            logger.info('form not valid')
+
+        logger.info('returning back to product page')
+        return HttpResponseRedirect(reverse('view_product', args=(pid,)))   
+
     else:
-        pnotification = PNotificationForm()
-    
+        logger.info('Default form with initial values')
+        pnotification = PNotificationForm(request.POST, instance=notifications)
+        if pnotification.is_valid():
+            pnotification.save()
+            logger.info('saved')
+        else:
+            logger.info('form not valid')
+          
+
+
+
+
+    logger.info('returning')
     return render(request,
                   'dojo/edit_product_notifications.html',
                   {'form': pnotification,
@@ -782,7 +804,6 @@ def edit_product(request, pid):
 
     if request.method == 'POST':
         form = ProductForm(request.POST, instance=prod)
-        pnotification = PNotificationForm(request.POST, instance=prod)
         if form.is_valid():
             form.save()
             tags = request.POST.getlist('tags')

@@ -7,6 +7,7 @@ from django.template.loader import render_to_string
 from django.db.models import Q, Count, Prefetch
 from django.urls import reverse
 from dojo.celery import app
+from dojo.models import PNotification
 
 
 logger = logging.getLogger(__name__)
@@ -231,15 +232,19 @@ def send_msteams_notification(msteamsurl, event, user=None, *args, **kwargs):
 
 
 def send_custom_msteams_notification(product, event, *args, **kwargs):
-    pass
-    should_notify = should_notify_product_spefific_notification_channels(product, event)
+    notifications = PNotification.objects.filter(product_id= product.id).first()
+    logger.info('sending notifications to')
+    logger.info(Notifications.product_id)
+    logger.info(notifications.msteams)
+    #should_notify = should_notify_product_spefific_notification_channels(product, event)
+    should_notify = True
     logger.info('Should notify?')
     logger.info(should_notify)
-    if not product is None and product.msteamsenabled and should_notify:
+    if not notifications is None and notifications.msteamsenabled and should_notify:
         try:
             res = requests.request(
                 method='POST',
-                url=product.msteams,
+                url=notifications.msteams,
                 data=create_notification_message(event, None, 'msteams', *args, **kwargs))
             if res.status_code != 200:
                 logger.error("Error when sending message to Microsoft Teams")

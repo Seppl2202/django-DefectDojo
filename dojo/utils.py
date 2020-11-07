@@ -29,7 +29,7 @@ import calendar as tcalendar
 from dojo.github import add_external_issue_github, update_external_issue_github, close_external_issue_github, reopen_external_issue_github
 from dojo.models import Finding, Engagement, Finding_Template, Product, JIRA_PKey, JIRA_Issue,\
     Dojo_User, User, System_Settings, Notifications, Endpoint, Benchmark_Type, \
-    Language_Type, Languages, Rule, Notes
+    Language_Type, Languages, Rule, Notes, PNotification
 from asteval import Interpreter
 from requests.auth import HTTPBasicAuth
 from dojo.notifications.helper import create_notification, send_custom_msteams_notification
@@ -2109,6 +2109,17 @@ def set_default_notifications(sender, instance, created, **kwargs):
         notifications = Notifications()
         notifications.user = instance
         notifications.save()
+
+
+@receiver(post_save, sender=PNotification)
+def notification_post_save(sender, instance, created, **kwargs):
+    logger.info('In post save')
+    notifications = instance
+    if created:
+        logger.info('Saved notifications')
+    else:
+        logger.info('Not created notifications')
+
 
 
 @receiver(post_save, sender=Engagement)

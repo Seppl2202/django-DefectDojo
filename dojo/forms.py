@@ -191,7 +191,7 @@ class Delete_Dev_EnvironmentForm(forms.ModelForm):
 class PNotificationForm(forms.ModelForm):
     class Meta:
         model = PNotification
-        exclude = ['']
+        fields = ['product_id', 'msteamsenabled', 'msteams', 'notification_engagement_add', 'notification_engagement_delete', 'notification_test_added']
 
 
 class ProductForm(forms.ModelForm):

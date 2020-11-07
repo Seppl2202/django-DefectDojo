@@ -560,15 +560,13 @@ class DojoMeta(models.Model):
                            ('endpoint', 'name'),
                            ('finding', 'name'))
 
-
 class PNotification(models.Model):
+    product_id = models.IntegerField(unique=True)
     msteamsenabled = models.BooleanField(default=False, help_text=('Specify if push notifications are enabled for this product.'))
     msteams = models.CharField(max_length=255, unique=False, null=True)
     notification_engagement_add = models.BooleanField(default=False, help_text='Receive messages when an engagement is added')
     notification_engagement_delete = models.BooleanField(default=False, help_text='Receive messages when an engagement is deleted')
     notification_test_added = models.BooleanField(default=False, help_text='Receive messages when a test is added')
-
-
 
 class Product(models.Model):
     WEB_PLATFORM = 'web'
@@ -816,6 +814,8 @@ class Product(models.Model):
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('view_product', args=[str(self.id)])
+
+
 
 
 class ScanSettings(models.Model):
