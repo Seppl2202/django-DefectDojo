@@ -2113,7 +2113,6 @@ def set_default_notifications(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=PNotification)
 def notification_post_save(sender, instance, created, **kwargs):
-    logger.info('In post save')
     notifications = instance
     if created:
         logger.info('Saved notifications')

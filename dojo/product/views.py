@@ -740,11 +740,11 @@ def new_product(request):
 def edit_product_notifications(request, pid):
     prod = Product.objects.get(pk=pid)
     logger.info('Editing product')
-    notifications = PNotification.objects.filter(product_id= pid).first()
+    #notifications = PNotification.objects.filter(product_id= pid).first()
 
     if request.method == 'POST':
         logger.info('Getting existing notifications')
-        pnotification = PNotificationForm(request.POST, instance=notifications)
+        pnotification = PNotificationForm(request.POST, instance=product.notification_object)
         if pnotification.is_valid():
             pnotification.save()
             logger.info('saved')
@@ -757,7 +757,7 @@ def edit_product_notifications(request, pid):
 
     else:
         logger.info('Default form with initial values')
-        pnotification = PNotificationForm(instance=notifications)
+        pnotification = PNotificationForm(instance=product.notification_object)
         if pnotification.is_valid():
             pnotification.save()
             logger.info('saved')

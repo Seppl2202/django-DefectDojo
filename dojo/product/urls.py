@@ -19,7 +19,7 @@ urlpatterns = [
         name='view_product_metrics'),
     url(r'^product/(?P<pid>\d+)/edit$', views.edit_product,
         name='edit_product'),
-    url(r'^product/(?P<pid>\d+)/edit/notifications/$', views.edit_product_notifications,
+    url(r'^product/(?P<pid>\d+)/edit/notifications$', views.edit_product_notifications,
         name='edit_product_notifications'),
     url(r'^product/(?P<pid>\d+)/delete$', views.delete_product,
         name='delete_product'),

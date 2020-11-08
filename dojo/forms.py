@@ -181,6 +181,7 @@ class Development_EnvironmentForm(forms.ModelForm):
     class Meta:
         model = Development_Environment
         fields = ['name']
+        
 
 
 class Delete_Dev_EnvironmentForm(forms.ModelForm):
@@ -192,7 +193,6 @@ class PNotificationForm(forms.ModelForm):
     class Meta:
         model = PNotification
         exclude = ['']
-
 
 class ProductForm(forms.ModelForm):
     name = forms.CharField(max_length=50, required=True)

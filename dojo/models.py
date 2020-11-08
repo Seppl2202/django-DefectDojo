@@ -561,7 +561,6 @@ class DojoMeta(models.Model):
                            ('finding', 'name'))
 
 class PNotification(models.Model):
-    product_id = models.IntegerField(unique=True)
     msteamsenabled = models.BooleanField(default=False, help_text=('Specify if push notifications are enabled for this product.'))
     msteams = models.CharField(max_length=255, unique=False, null=True)
     notification_engagement_add = models.BooleanField(default=False, help_text='Receive messages when an engagement is added')
@@ -583,6 +582,9 @@ class PNotification(models.Model):
     notification_review_codereview = models.BooleanField(default=False, help_text='Receive messages when a manual code review is requested')
     notification_scan_add = models.BooleanField(default=False, help_text='Receive messages when a scan is added')
     notification_jira_update = models.BooleanField(default=False, help_text='Receive messages about a jira updates')
+
+
+
 
 
 class Product(models.Model):
@@ -638,6 +640,7 @@ class Product(models.Model):
         (NONE_CRITICALITY, _('None')),
     )
 
+    notification_object = models.ForeignKey(PNotification, on_delete=models.CASCADE, default=PNotification.objects.create)
     name = models.CharField(max_length=255, unique=True)
 
     
