@@ -561,6 +561,7 @@ class DojoMeta(models.Model):
                            ('finding', 'name'))
 
 class PNotification(models.Model):
+    notification_id = models.AutoField(primary_key=True, unique=True)
     msteamsenabled = models.BooleanField(default=False, help_text=('Specify if push notifications are enabled for this product.'))
     msteams = models.CharField(max_length=255, unique=False, null=True)
     notification_engagement_add = models.BooleanField(default=False, help_text='Receive messages when an engagement is added')
@@ -588,7 +589,7 @@ def get_notifications():
     noti = PNotification.objects.create()
     logger.info('Created notifiactions')
     logger.info(noti.msteamsenabled)
-    return noti
+    return noti.notification_id
 
 
 class Product(models.Model):
@@ -644,7 +645,7 @@ class Product(models.Model):
         (NONE_CRITICALITY, _('None')),
     )
 
-    notification_object = models.ForeignKey(PNotification, on_delete=models.CASCADE, default=get_notifications)
+    notification_object = models.ForeignKey(PNotification, unique=True, on_delete=models.CASCADE, default=get_notifications)
     name = models.CharField(max_length=255, unique=True)
 
     

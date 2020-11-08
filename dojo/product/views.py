@@ -739,6 +739,8 @@ def new_product(request):
 
 def edit_product_notifications(request, pid):
     prod = Product.objects.get(pk=pid)
+    logger.info('editing noti object')
+    logger.info(prod.notification_object.msteamsenabled)
     if request.method == 'POST':
         logger.info('Getting existing notifications')
         pnotification = PNotificationForm(request.POST, instance=prod.notification_object)
@@ -777,6 +779,9 @@ def edit_product_notifications(request, pid):
 @user_must_be_authorized(Product, 'staff', 'pid')
 def edit_product(request, pid):
     prod = Product.objects.get(pk=pid)
+    logger.info('Product with')
+    logger.info(prod.notification_object.notification_id)
+    logger.info(prod.notification_object.msteamsenabled)
     system_settings = System_Settings.objects.get()
     jira_enabled = system_settings.enable_jira
     jira_inst = None
