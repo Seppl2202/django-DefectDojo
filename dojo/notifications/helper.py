@@ -236,8 +236,7 @@ def send_custom_msteams_notification(product, event, *args, **kwargs):
     logger.info('MS Teams enabled?')
     logger.info(product.notification_object.msteamsenabled)
     notifications = product.notification_object
-    #should_notify = should_notify_product_spefific_notification_channels(product, event)
-    should_notify = True
+    should_notify = should_notify_product_spefific_notification_channels(product.notification_object, event)
     logger.info('Should notify?')
     logger.info(should_notify)
     if not notifications is None and notifications.msteamsenabled and should_notify:

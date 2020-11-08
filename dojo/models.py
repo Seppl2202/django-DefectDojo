@@ -584,7 +584,11 @@ class PNotification(models.Model):
     notification_jira_update = models.BooleanField(default=False, help_text='Receive messages about a jira updates')
 
 
-
+def get_notifications():
+    noti = PNotification.objects.create()
+    logger.info('Created notifiactions')
+    logger.info(noti.msteamsenabled)
+    return noti
 
 
 class Product(models.Model):
@@ -640,7 +644,7 @@ class Product(models.Model):
         (NONE_CRITICALITY, _('None')),
     )
 
-    notification_object = models.ForeignKey(PNotification, on_delete=models.CASCADE, default=PNotification.objects.create)
+    notification_object = models.ForeignKey(PNotification, on_delete=models.CASCADE, default=get_notifications)
     name = models.CharField(max_length=255, unique=True)
 
     
