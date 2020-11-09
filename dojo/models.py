@@ -588,7 +588,7 @@ class PNotification(models.Model):
 def get_notifications():
     noti = PNotification.objects.create()
     logger.info('Created notifiactions')
-    logger.info(noti.msteamsenabled)
+    logger.info(noti.notification_id)
     return noti.notification_id
 
 
@@ -645,7 +645,7 @@ class Product(models.Model):
         (NONE_CRITICALITY, _('None')),
     )
 
-    notification_object = models.ForeignKey(PNotification, unique=True, on_delete=models.CASCADE, default=get_notifications)
+    notification_object = models.ForeignKey(PNotification, on_delete=models.CASCADE, default=get_notifications)
     name = models.CharField(max_length=255, unique=True)
 
     

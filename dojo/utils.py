@@ -2115,7 +2115,7 @@ def set_default_notifications(sender, instance, created, **kwargs):
 def notification_post_save(sender, instance, created, **kwargs):
     notifications = instance
     if created:
-        logger.info('Saved notifications')
+        logger.info('Saved notifications in post_save')
     else:
         logger.info('Not created notifications')
 

@@ -83,6 +83,11 @@
                                                 <i class="fa fa-pencil-square-o"></i> Edit
                                             </a>
                                           </li>
+                                          <li role="presentation">
+                                            <a class="" href="{% url 'edit_product_notifications' prod.id %}">
+                                                <i class="fa fa-pencil-square-o"></i> Edit notification settings
+                                            </a>
+                                          </li>
                                         {% endif %}
                                         {% if user|is_authorized_for_staff:prod %}
                                           <li role="separator" class="divider"></li>
