@@ -234,12 +234,13 @@ def send_msteams_notification(msteamsurl, event, user=None, *args, **kwargs):
 def send_custom_msteams_notification(product, event, *args, **kwargs):
 #    notifications = PNotification.objects.filter(product_id= product.id).first()
     logger.info('MS Teams enabled?')
-    logger.info(product.notification_object.msteamsenabled)
     notifications = product.notification_object
-    should_notify = should_notify_product_spefific_notification_channels(product.notification_object, event)
+    #should_notify = should_notify_product_spefific_notification_channels(product.notification_object, event)
+    should_notify = False
     logger.info('Should notify?')
     logger.info(should_notify)
-    if not notifications is None and notifications.msteamsenabled and should_notify:
+    #if not notifications is None and notifications.msteamsenabled and should_notify:
+    if should_notify:
         try:
             res = requests.request(
                 method='POST',

@@ -21,10 +21,10 @@ from dojo.templatetags.display_tags import get_level
 from dojo.filters import ProductFilter, EngagementFilter, ProductMetricsEndpointFilter, ProductMetricsFindingFilter, ProductComponentFilter
 from dojo.forms import ProductForm, EngForm, DeleteProductForm, DojoMetaDataForm, JIRAPKeyForm, JIRAFindingForm, AdHocFindingForm, \
                        EngagementPresetsForm, DeleteEngagementPresetsForm, Sonarqube_ProductForm, ProductNotificationsForm, \
-                       GITHUB_Product_Form, GITHUBFindingForm, App_AnalysisTypeForm, JIRAEngagementForm, PNotificationForm
+                       GITHUB_Product_Form, GITHUBFindingForm, App_AnalysisTypeForm, JIRAEngagementForm, PNotificationForm, TeamsNotificationsForm, SlackNotificationsForm
 from dojo.models import Product_Type, Note_Type, Finding, Product, Engagement, ScanSettings, Risk_Acceptance, Test, JIRA_PKey, GITHUB_PKey, Finding_Template, \
                         Test_Type, System_Settings, Languages, App_Analysis, Benchmark_Type, Benchmark_Product_Summary, Endpoint_Status, \
-                        Endpoint, Engagement_Presets, DojoMeta, Sonarqube_Product, Notifications, Dojo_User, BurpRawRequestResponse, PNotification
+                        Endpoint, Engagement_Presets, DojoMeta, Sonarqube_Product, Notifications, Dojo_User, BurpRawRequestResponse, PNotification, TeamsNotifications, SlackNotifications
 
 from dojo.utils import get_page_items, add_breadcrumb, get_system_setting, Product_Tab, get_punchcard_data, add_epic, queryset_check
 from dojo.notifications.helper import create_notification, send_custom_msteams_notification
@@ -740,37 +740,46 @@ def new_product(request):
 def edit_product_notifications(request, pid):
     prod = Product.objects.get(pk=pid)
     logger.info('editing noti object')
-    logger.info(prod.notification_object.msteamsenabled)
+    teams_notifications = TeamsNotificationsForm(request.POST, instance=prod.notification_object.teams_notifications)
+    slack_notifications = SlackNotificationsForm(request.POST, instance=prod.notification_object.slack_notifications)
+    logger.info(prod.notification_object.teams_notifications.msteams)
+    logger.info(prod.notification_object.slack_notifications.slack)
     if request.method == 'POST':
         logger.info('Getting existing notifications')
-        pnotification = PNotificationForm(request.POST, instance=prod.notification_object)
-        if pnotification.is_valid():
-            pnotification.save()
-            logger.info('saved')
+        if teams_notifications.is_valid():
+            teams_notifications.save()
+            logger.info('Saved teams notifications')
             
         else:
             logger.info('form not valid')
+        
+        if slack_notifications.is_valid():
+            slack_notifications.save()
+            logger.info('Saved slack notifications')
 
         logger.info('returning back to product page')
         return HttpResponseRedirect(reverse('view_product', args=(pid,)))   
 
     else:
         logger.info('Default form with initial values')
-        pnotification = PNotificationForm(instance=prod.notification_object)
-        if pnotification.is_valid():
-            pnotification.save()
-            logger.info('saved')
+        teams_notifications = TeamsNotificationsForm(instance=prod.notification_object.teams_notifications)
+        slack_notifications = SlackNotificationsForm(instance=prod.notification_object.slack_notifications)
+        if teams_notifications.is_valid():
+            teams_notifications.save()
+            logger.info('Saved teams notifications')
+            
         else:
             logger.info('form not valid')
+        
+        if slack_notifications.is_valid():
+            slack_notifications.save()
+            logger.info('Saved slack notifications')
           
-
-
-
-
     logger.info('returning')
     return render(request,
                   'dojo/edit_product_notifications.html',
-                  {'form': pnotification,
+                  {'teams_form': teams_notifications,
+                   'slack_form': slack_notifications,
                    'product': prod
                    })
 

@@ -3,13 +3,26 @@
 
 {% block content %}
     <h3> Edit Notifications for {{ product.name }}</h3>
-    <form class="form-horizontal" method="post">{% csrf_token %}
-        {% include "dojo/form_fields.html" with form=form %}
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-                <input class="btn btn-primary" type="submit" value="Submit"/>
-            </div>
+
+
+<form class="form-horizontal" method="post">{% csrf_token %}
+    {% include "dojo/form_fields.html" with form=teams_form %}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <input class="btn btn-primary" type="submit" value="Submit"/>
         </div>
-        {{ form.errors }}
-    </form>
+    </div>
+    {{ form.errors }}
+</form>
+
+<form class="form-horizontal" method="post">{% csrf_token %}
+    {% include "dojo/form_fields.html" with form=slack_form %}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <input class="btn btn-primary" type="submit" value="Submit"/>
+        </div>
+    </div>
+    {{ form.errors }}
+</form>
+
 {% endblock %}
