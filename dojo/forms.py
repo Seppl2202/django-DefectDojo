@@ -26,7 +26,7 @@ from dojo.models import Finding, Product_Type, Product, Note_Type, ScanSettings,
     Languages, Language_Type, App_Analysis, Objects, Benchmark_Product, Benchmark_Requirement, \
     Benchmark_Product_Summary, Rule, Child_Rule, Engagement_Presets, DojoMeta, Sonarqube_Product, \
     Engagement_Survey, Answered_Survey, TextAnswer, ChoiceAnswer, Choice, Question, TextQuestion, \
-    ChoiceQuestion, General_Survey, Regulation, PNotification
+    ChoiceQuestion, General_Survey, Regulation, PNotification, TeamsNotifications, SlackNotifications
 
 from dojo.tools import requires_file, SCAN_SONARQUBE_API
 from dojo.utils import jira_get_issue
@@ -189,10 +189,21 @@ class Delete_Dev_EnvironmentForm(forms.ModelForm):
         model = Development_Environment
         exclude = ['name']
 
+class TeamsNotificationsForm(forms.ModelForm):
+    class Meta:
+        model = TeamsNotifications
+        exclude = ['']
+
+class SlackNotificationsForm(forms.ModelForm):
+    class Meta:
+        model = SlackNotifications
+        exclude = ['']
+
 class PNotificationForm(forms.ModelForm):
     class Meta:
         model = PNotification
         exclude = ['']
+
 
 class ProductForm(forms.ModelForm):
     name = forms.CharField(max_length=50, required=True)

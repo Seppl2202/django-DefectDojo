@@ -560,8 +560,14 @@ class DojoMeta(models.Model):
                            ('endpoint', 'name'),
                            ('finding', 'name'))
 
-class PNotification(models.Model):
-    notification_id = models.AutoField(primary_key=True, unique=True)
+
+def get_default_teams_notifications():
+    return TeamsNotifications.objects.create().id
+
+def get_default_slack_notifications():
+    return SlackNotifications.objects.create().id
+
+class TeamsNotifications(models.Model):
     msteamsenabled = models.BooleanField(default=False, help_text=('Specify if push notifications are enabled for this product.'))
     msteams = models.CharField(max_length=255, unique=False, null=True)
     notification_engagement_add = models.BooleanField(default=False, help_text='Receive messages when an engagement is added')
@@ -584,12 +590,19 @@ class PNotification(models.Model):
     notification_scan_add = models.BooleanField(default=False, help_text='Receive messages when a scan is added')
     notification_jira_update = models.BooleanField(default=False, help_text='Receive messages about a jira updates')
 
+class SlackNotifications(models.Model):
+    slackenabled = models.BooleanField(default=False, help_text=('Specify if push notifications to Slack are enabled for this product.'))
+    slack = models.CharField(max_length=255, unique=False, null=True)
 
-def get_notifications():
-    noti = PNotification.objects.create()
-    logger.info('Created notifiactions')
-    logger.info(noti.notification_id)
-    return noti.notification_id
+
+class PNotification(models.Model):
+    teams_notifications = models.OneToOneField(TeamsNotifications, default=get_default_teams_notifications, on_delete=models.CASCADE)
+    slack_notifications = models.OneToOneField(SlackNotifications, default=get_default_slack_notifications, on_delete=models.CASCADE)
+
+
+
+def get_default_PNotification():
+    return PNotification.objects.create().id
 
 
 class Product(models.Model):
@@ -645,7 +658,7 @@ class Product(models.Model):
         (NONE_CRITICALITY, _('None')),
     )
 
-    notification_object = models.ForeignKey(PNotification, on_delete=models.CASCADE, default=get_notifications)
+    notification_object = models.ForeignKey(PNotification, on_delete=models.CASCADE, default=get_default_PNotification)
     name = models.CharField(max_length=255, unique=True)
 
     
