@@ -592,7 +592,8 @@ class TeamsNotifications(models.Model):
 
 class SlackNotifications(models.Model):
     slackenabled = models.BooleanField(default=False, help_text=('Specify if push notifications to Slack are enabled for this product.'))
-    slack = models.CharField(max_length=255, unique=False, null=True)
+    slacktoken = models.CharField(max_length=255, unique=False, null=True)
+    slackchannel = models.CharField(max_length=255, unique=False, null=True)
     notification_engagement_add = models.BooleanField(default=False, help_text='Receive messages when an engagement is added')
     notification_engagement_delete = models.BooleanField(default=False, help_text='Receive messages when an engagement is deleted')
     notification_engagement_upcoming = models.BooleanField(default=False, help_text='Receive messages when an engagement is upcoming')

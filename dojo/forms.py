@@ -226,7 +226,8 @@ class TeamsNotificationsForm(forms.ModelForm):
 
 class SlackNotificationsForm(forms.ModelForm):
     slackenabled = forms.BooleanField(label='Acticate Slack notifications', required=False, help_text='Specify if push notifications are enabled for this product')
-    slack = forms.CharField(label='Slack URL', required=False, help_text='The configured  URL of your Slack channel')
+    slacktoken = forms.CharField(label='Slack Token', required=False, help_text='The configured  OAuth token')
+    slackchannel = forms.CharField(label='Slack channel', required=False, help_text='The configured channel of Slack')
     notification_engagement_add = forms.BooleanField(label='Engagement added', required=False, help_text='Receive messages when an engagement is added')
     notification_engagement_delete = forms.BooleanField(label='Engagement deleted', required=False, help_text='Receive messages when an engagement is deleted')
     notification_engagement_upcoming = forms.BooleanField(label='Upcoming added', required=False, help_text='Receive messages when an engagement is upcoming')

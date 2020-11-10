@@ -742,8 +742,6 @@ def edit_product_notifications(request, pid):
     logger.info('editing noti object')
     teams_notifications = TeamsNotificationsForm(request.POST, instance=prod.notification_object.teams_notifications)
     slack_notifications = SlackNotificationsForm(request.POST, instance=prod.notification_object.slack_notifications)
-    logger.info(prod.notification_object.teams_notifications.msteams)
-    logger.info(prod.notification_object.slack_notifications.slack)
     if request.method == 'POST':
         logger.info('Getting existing notifications')
         if teams_notifications.is_valid():

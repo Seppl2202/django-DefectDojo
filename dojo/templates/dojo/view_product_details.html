@@ -28,11 +28,6 @@
                                       </a>
                   </li>
                 {% endif %}
-                <li role="presentation">
-                  <a class="" href="{% url 'edit_product_notifications' prod.id %}">
-                                        <i class="fa fa-bell"></i> Edit notification settings
-                                    </a>
-                </li>
                 {% if user|is_authorized_for_staff:prod %}
                   <li role="separator" class="divider"></li>
                   <li role="presentation">

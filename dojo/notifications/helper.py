@@ -253,8 +253,21 @@ def send_custom_msteams_notification(product, event, *args, **kwargs):
                 raise RuntimeError('Error posting message to Microsoft Teams: ' + res.text)
         except Exception as e:
             logger.exception(e)
-            log_alert(e, "Microsoft Teams Notification", title=kwargs['title'], description=str(e), url=kwargs['url'])
-            pass      
+            logger.alert(e, "Microsoft Teams Notification", title=kwargs['title'], description=str(e), url=kwargs['url'])
+            pass
+
+    if product.notification_object.slack_notifications.slackenabled:
+        logger.info('Sending to slack')
+        res = requests.request(
+            method='POST',
+            url='https://slack.com/api/chat.postMessage',
+            data={
+                'token': product.notification_object.slack_notifications.slacktoken,
+                'channel': product.notification_object.slack_notifications.slackchannel,
+                'text': create_notification_message(event, 'user', 'slack', *args, **kwargs)
+            })
+        logger.info(res.status_code)
+        logger.info(res.text)
 
 
 def should_notify_product_spefific_notification_channels(notification, event):
