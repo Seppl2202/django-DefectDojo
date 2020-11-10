@@ -232,19 +232,14 @@ def send_msteams_notification(msteamsurl, event, user=None, *args, **kwargs):
 
 
 def send_custom_msteams_notification(product, event, *args, **kwargs):
-#    notifications = PNotification.objects.filter(product_id= product.id).first()
-    logger.info('MS Teams enabled?')
     notifications = product.notification_object
-    #should_notify = should_notify_product_spefific_notification_channels(product.notification_object, event)
-    should_notify = False
-    logger.info('Should notify?')
-    logger.info(should_notify)
-    #if not notifications is None and notifications.msteamsenabled and should_notify:
-    if should_notify:
+
+    if notifications.teams_notifications.should_notify_for_event(event):
         try:
+            logger.info('Sending product specific teams notifications')
             res = requests.request(
                 method='POST',
-                url=notifications.msteams,
+                url=notifications.teams_notifications.msteams,
                 data=create_notification_message(event, None, 'msteams', *args, **kwargs))
             if res.status_code != 200:
                 logger.error("Error when sending message to Microsoft Teams")
@@ -256,63 +251,19 @@ def send_custom_msteams_notification(product, event, *args, **kwargs):
             logger.alert(e, "Microsoft Teams Notification", title=kwargs['title'], description=str(e), url=kwargs['url'])
             pass
 
-    if product.notification_object.slack_notifications.slackenabled:
+    if notifications.slack_notifications.should_notify_for_event(event):
         logger.info('Sending to slack')
         res = requests.request(
             method='POST',
             url='https://slack.com/api/chat.postMessage',
             data={
-                'token': product.notification_object.slack_notifications.slacktoken,
-                'channel': product.notification_object.slack_notifications.slackchannel,
+                'token': notifications.slack_notifications.slacktoken,
+                'channel': notifications.slack_notifications.slackchannel,
                 'text': create_notification_message(event, 'user', 'slack', *args, **kwargs)
             })
         logger.info(res.status_code)
         logger.info(res.text)
 
-
-def should_notify_product_spefific_notification_channels(notification, event):
-
-    if notification.notification_engagement_add and event =='engagement_added':
-        return True
-    if notification.notification_engagement_delete and event == 'engagement_delete':
-        return True
-    if notification.notification_engagement_upcoming and event == 'engagement_upcoming':
-        return True
-    if notification.notification_engagement_stale and event == 'engagement_stale':
-        return True
-    if notification.notification_engagement_close and event == 'engagement_close':
-        return True
-    if notification.notification_engagement_reopen and event == 'engagement_reopen':
-        return True
-    if notification.notification_engagement_auto_close and event == 'auto_close_engagement':
-        return True
-    if notification.notification_test_add and event == 'test_added':
-        return True
-    if notification.notification_test_delete and event == 'test_delete':
-        return True
-    if notification.notification_product_add and event == 'product_added':
-        return True
-    if notification.notification_product_delete and event == 'product_delete':
-        return True
-    if notification.notification_finding_add and event == 'finding_add':
-        return True
-    if notification.notification_finding_close and event == 'finding_close':
-        return True
-    if notification.notification_finding_delete and event == 'finding_delete':
-        return True
-    if notification.notification_finding_reopen and event == 'finding_reopen':
-        return True
-    if notification.notification_review_requested and event == 'review_requested':
-        return True
-    if notification.notification_review_codereview and event == 'code_review':
-        return True
-    if notification.notification_scan_add and event == 'scan_added':
-        return True
-    if notification.notification_jira_update and event == 'jira_update':
-        return True
-
-    logger.info('None of them, returning false')
-    return False
 
 
 @app.task(name='send_mail_notification')

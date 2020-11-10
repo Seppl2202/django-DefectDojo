@@ -590,6 +590,53 @@ class TeamsNotifications(models.Model):
     notification_scan_add = models.BooleanField(default=False, help_text='Receive messages when a scan is added')
     notification_jira_update = models.BooleanField(default=False, help_text='Receive messages about a jira updates')
 
+    def should_notify_for_event(self, event):
+
+        if self.msteamsenabled == False:
+            return False
+
+        if self.notification_engagement_add and event =='engagement_added':
+            return True
+        if self.notification_engagement_delete and event == 'engagement_delete':
+            return True
+        if self.notification_engagement_upcoming and event == 'engagement_upcoming':
+            return True
+        if self.notification_engagement_stale and event == 'engagement_stale':
+            return True
+        if self.notification_engagement_close and event == 'engagement_close':
+            return True
+        if self.notification_engagement_reopen and event == 'engagement_reopen':
+            return True
+        if self.notification_engagement_auto_close and event == 'auto_close_engagement':
+            return True
+        if self.notification_test_add and event == 'test_added':
+            return True
+        if self.notification_test_delete and event == 'test_delete':
+            return True
+        if self.notification_product_add and event == 'product_added':
+            return True
+        if self.notification_product_delete and event == 'product_delete':
+            return True
+        if self.notification_finding_add and event == 'finding_add':
+            return True
+        if self.notification_finding_close and event == 'finding_close':
+            return True
+        if self.notification_finding_delete and event == 'finding_delete':
+            return True
+        if self.notification_finding_reopen and event == 'finding_reopen':
+            return True
+        if self.notification_review_requested and event == 'review_requested':
+            return True
+        if self.notification_review_codereview and event == 'code_review':
+            return True
+        if self.notification_scan_add and event == 'scan_added':
+            return True
+        if self.notification_jira_update and event == 'jira_update':
+            return True
+
+        logger.info('None of them, returning false')
+        return False    
+
 class SlackNotifications(models.Model):
     slackenabled = models.BooleanField(default=False, help_text=('Specify if push notifications to Slack are enabled for this product.'))
     slacktoken = models.CharField(max_length=255, unique=False, null=True)
@@ -613,6 +660,54 @@ class SlackNotifications(models.Model):
     notification_review_codereview = models.BooleanField(default=False, help_text='Receive messages when a manual code review is requested')
     notification_scan_add = models.BooleanField(default=False, help_text='Receive messages when a scan is added')
     notification_jira_update = models.BooleanField(default=False, help_text='Receive messages about a jira updates')
+
+
+    def should_notify_for_event(self, event):
+
+        if self.slackenabled == False:
+            return False
+
+        if self.notification_engagement_add and event =='engagement_added':
+            return True
+        if self.notification_engagement_delete and event == 'engagement_delete':
+            return True
+        if self.notification_engagement_upcoming and event == 'engagement_upcoming':
+            return True
+        if self.notification_engagement_stale and event == 'engagement_stale':
+            return True
+        if self.notification_engagement_close and event == 'engagement_close':
+            return True
+        if self.notification_engagement_reopen and event == 'engagement_reopen':
+            return True
+        if self.notification_engagement_auto_close and event == 'auto_close_engagement':
+            return True
+        if self.notification_test_add and event == 'test_added':
+            return True
+        if self.notification_test_delete and event == 'test_delete':
+            return True
+        if self.notification_product_add and event == 'product_added':
+            return True
+        if self.notification_product_delete and event == 'product_delete':
+            return True
+        if self.notification_finding_add and event == 'finding_add':
+            return True
+        if self.notification_finding_close and event == 'finding_close':
+            return True
+        if self.notification_finding_delete and event == 'finding_delete':
+            return True
+        if self.notification_finding_reopen and event == 'finding_reopen':
+            return True
+        if self.notification_review_requested and event == 'review_requested':
+            return True
+        if self.notification_review_codereview and event == 'code_review':
+            return True
+        if self.notification_scan_add and event == 'scan_added':
+            return True
+        if self.notification_jira_update and event == 'jira_update':
+            return True
+
+        logger.info('None of them, returning false')
+        return False
 
 
 class PNotification(models.Model):

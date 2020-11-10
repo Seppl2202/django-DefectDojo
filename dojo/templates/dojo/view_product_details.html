@@ -24,8 +24,8 @@
                 {% if user|is_authorized_for_change:prod %}
                   <li role="presentation">
                     <a class="" href="{% url 'edit_product' prod.id %}">
-                                          <i class="fa fa-pencil-square-o"></i> Edit
-                                      </a>
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
                   </li>
                 {% endif %}
                 {% if user|is_authorized_for_staff:prod %}

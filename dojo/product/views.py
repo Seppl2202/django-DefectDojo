@@ -740,40 +740,24 @@ def new_product(request):
 def edit_product_notifications(request, pid):
     prod = Product.objects.get(pk=pid)
     logger.info('editing noti object')
-    teams_notifications = TeamsNotificationsForm(request.POST, instance=prod.notification_object.teams_notifications)
-    slack_notifications = SlackNotificationsForm(request.POST, instance=prod.notification_object.slack_notifications)
+    teams_notifications = TeamsNotificationsForm(request.POST, instance=prod.notification_object.teams_notifications, prefix='teams')
+    logger.info(prod.notification_object.teams_notifications.msteams)
+    slack_notifications = SlackNotificationsForm(request.POST, instance=prod.notification_object.slack_notifications, prefix='slack')
+    logger.info(prod.notification_object.slack_notifications.slackchannel)
     if request.method == 'POST':
-        logger.info('Getting existing notifications')
-        if teams_notifications.is_valid():
-            teams_notifications.save()
-            logger.info('Saved teams notifications')
-            
-        else:
-            logger.info('form not valid')
-        
-        if slack_notifications.is_valid():
-            slack_notifications.save()
-            logger.info('Saved slack notifications')
+        if 'save_teams' in request.POST:
+            teams_notifications = TeamsNotificationsForm(request.POST, instance=prod.notification_object.teams_notifications, prefix='teams')
+            if teams_notifications.is_valid():
+                teams_notifications.save()
+        if 'save_slack' in request.POST:
+            slack_notifications = SlackNotificationsForm(request.POST, instance=prod.notification_object.slack_notifications, prefix='slack')
+            if slack_notifications.is_valid():
+                slack_notifications.save()
 
-        logger.info('returning back to product page')
-        return HttpResponseRedirect(reverse('view_product', args=(pid,)))   
 
-    else:
-        logger.info('Default form with initial values')
-        teams_notifications = TeamsNotificationsForm(instance=prod.notification_object.teams_notifications)
-        slack_notifications = SlackNotificationsForm(instance=prod.notification_object.slack_notifications)
-        if teams_notifications.is_valid():
-            teams_notifications.save()
-            logger.info('Saved teams notifications')
-            
-        else:
-            logger.info('form not valid')
-        
-        if slack_notifications.is_valid():
-            slack_notifications.save()
-            logger.info('Saved slack notifications')
-          
-    logger.info('returning')
+        return HttpResponseRedirect(reverse('edit_product_notifications', args=(pid,)))   
+
+ 
     return render(request,
                   'dojo/edit_product_notifications.html',
                   {'teams_form': teams_notifications,
