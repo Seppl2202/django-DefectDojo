@@ -736,7 +736,7 @@ def new_product(request):
                    'sonarqube_form': Sonarqube_ProductForm()})
 
 
-
+@user_must_be_authorized(Product, 'staff', 'pid')
 def edit_product_notifications(request, pid):
     prod = Product.objects.get(pk=pid)
     logger.info('editing noti object')
