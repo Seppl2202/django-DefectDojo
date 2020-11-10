@@ -569,7 +569,30 @@ def get_default_slack_notifications():
 
 class TeamsNotifications(models.Model):
     msteamsenabled = models.BooleanField(default=False, help_text=('Specify if push notifications are enabled for this product.'))
-    msteams = models.CharField(max_length=255, unique=False, null=True)
+    msteams = models.CharField(max_length=255, unique=False, default='')
+    notification_engagement_add = models.BooleanField(default=False, help_text='Receive messages when an engagement is added')
+    notification_engagement_delete = models.BooleanField(default=False, help_text='Receive messages when an engagement is deleted')
+    notification_engagement_upcoming = models.BooleanField(default=False, help_text='Receive messages when an engagement is upcoming')
+    notification_engagement_stale = models.BooleanField(default=False, help_text='Receive messages when an engagement is stale')
+    notification_engagement_close = models.BooleanField(default=False, help_text='Receive messages when an engagement was closed')
+    notification_engagement_reopen = models.BooleanField(default=False, help_text='Receive messages when an engagement was reopened')
+    notification_engagement_auto_close = models.BooleanField(default=False, help_text='Receive messages when an engagement was auto-closed')
+    notification_test_add = models.BooleanField(default=False, help_text='Receive messages when a test is added')
+    notification_test_delete = models.BooleanField(default=False, help_text='Receive messages when a test was deleted')
+    notification_product_add = models.BooleanField(default=False, help_text='Receive messages when a product is added')
+    notification_product_delete = models.BooleanField(default=False, help_text='Receive messages when a product was deleted')
+    notification_finding_add = models.BooleanField(default=False, help_text='Receive messages when a finding is added')
+    notification_finding_close = models.BooleanField(default=False, help_text='Receive messages when a finding is closed')
+    notification_finding_delete = models.BooleanField(default=False, help_text='Receive messages when a finding is deleted')
+    notification_finding_reopen = models.BooleanField(default=False, help_text='Receive messages when a finding is reopened')
+    notification_review_requested = models.BooleanField(default=False, help_text='Receive messages when a review is requested')
+    notification_review_codereview = models.BooleanField(default=False, help_text='Receive messages when a manual code review is requested')
+    notification_scan_add = models.BooleanField(default=False, help_text='Receive messages when a scan is added')
+    notification_jira_update = models.BooleanField(default=False, help_text='Receive messages about a jira updates')
+
+class SlackNotifications(models.Model):
+    slackenabled = models.BooleanField(default=False, help_text=('Specify if push notifications to Slack are enabled for this product.'))
+    slack = models.CharField(max_length=255, unique=False, null=True)
     notification_engagement_add = models.BooleanField(default=False, help_text='Receive messages when an engagement is added')
     notification_engagement_delete = models.BooleanField(default=False, help_text='Receive messages when an engagement is deleted')
     notification_engagement_upcoming = models.BooleanField(default=False, help_text='Receive messages when an engagement is upcoming')
@@ -589,10 +612,6 @@ class TeamsNotifications(models.Model):
     notification_review_codereview = models.BooleanField(default=False, help_text='Receive messages when a manual code review is requested')
     notification_scan_add = models.BooleanField(default=False, help_text='Receive messages when a scan is added')
     notification_jira_update = models.BooleanField(default=False, help_text='Receive messages about a jira updates')
-
-class SlackNotifications(models.Model):
-    slackenabled = models.BooleanField(default=False, help_text=('Specify if push notifications to Slack are enabled for this product.'))
-    slack = models.CharField(max_length=255, unique=False, null=True)
 
 
 class PNotification(models.Model):

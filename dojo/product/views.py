@@ -789,8 +789,6 @@ def edit_product_notifications(request, pid):
 def edit_product(request, pid):
     prod = Product.objects.get(pk=pid)
     logger.info('Product with')
-    logger.info(prod.notification_object.notification_id)
-    logger.info(prod.notification_object.msteamsenabled)
     system_settings = System_Settings.objects.get()
     jira_enabled = system_settings.enable_jira
     jira_inst = None

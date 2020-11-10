@@ -190,11 +190,62 @@ class Delete_Dev_EnvironmentForm(forms.ModelForm):
         exclude = ['name']
 
 class TeamsNotificationsForm(forms.ModelForm):
+    msteamsenabled = forms.BooleanField(label='Acticate Teams notifications', required=False, help_text='Specify if push notifications are enabled for this product')
+    msteams = forms.CharField(label='Teams webhook URL', required=False, help_text='The configured webhook URL of your Teams channel')
+    notification_engagement_add = forms.BooleanField(label='Engagement added', required=False, help_text='Receive messages when an engagement is added')
+    notification_engagement_delete = forms.BooleanField(label='Engagement deleted', required=False, help_text='Receive messages when an engagement is deleted')
+    notification_engagement_upcoming = forms.BooleanField(label='Upcoming added', required=False, help_text='Receive messages when an engagement is upcoming')
+    notification_engagement_stale = forms.BooleanField(label='Engagement stale', required=False, help_text='Receive messages when an engagement is stale')
+    notification_engagement_close = forms.BooleanField(label='Engagement closed', required=False, help_text='Receive messages when an engagement was closed')
+    notification_engagement_reopen = forms.BooleanField(label='Engagement reopened', required=False, help_text='Receive messages when an engagement was reopened')
+    notification_engagement_auto_close = forms.BooleanField(label='Engagement auto-closed', required=False, help_text='Receive messages when an engagement was auto-closed')
+    notification_test_add = forms.BooleanField(label='Test added', required=False, help_text='Receive messages when a test is added')
+    notification_test_delete = forms.BooleanField(label='Test deleted', required=False, help_text='Receive messages when a test was deleted')
+    notification_product_add = forms.BooleanField(label='Product added', required=False, help_text='Receive messages when a product is added')
+    notification_product_delete = forms.BooleanField(label='Engagement deleted', required=False, help_text='Receive messages when a product was deleted')
+    notification_finding_add = forms.BooleanField(label='Finding added', required=False, help_text='Receive messages when a finding is added')
+    notification_finding_close = forms.BooleanField(label='Finding closed', required=False, help_text='Receive messages when a finding is closed')
+    notification_finding_delete = forms.BooleanField(label='Finding deleted', required=False, help_text='Receive messages when a finding is deleted')
+    notification_finding_reopen = forms.BooleanField(label='Finding reopened', required=False, help_text='Receive messages when a finding is reopened')
+    notification_review_requested = forms.BooleanField(label='Review requested', required=False, help_text='Receive messages when a review is requested')
+    notification_review_codereview = forms.BooleanField(label='Codereview requested', required=False, help_text='Receive messages when a manual code review is requested')
+    notification_scan_add = forms.BooleanField(label='Scan added', required=False, help_text='Receive messages when a scan is added')
+    notification_jira_update = forms.BooleanField(label='JIRA updates', required=False, help_text='Receive messages about a jira updates')
     class Meta:
         model = TeamsNotifications
         exclude = ['']
+    
+    def clean(self):
+        cd = self.cleaned_data
+        if cd.get('msteeamsenabled'):
+            teams = cd.get('msteams')
+            if teams is None or teams == '':
+                raise ValidationError('You must configure an URL if you enable notifications for MS Teams')
+        return cd
+       
 
 class SlackNotificationsForm(forms.ModelForm):
+    slackenabled = forms.BooleanField(label='Acticate Slack notifications', required=False, help_text='Specify if push notifications are enabled for this product')
+    slack = forms.CharField(label='Slack URL', required=False, help_text='The configured  URL of your Slack channel')
+    notification_engagement_add = forms.BooleanField(label='Engagement added', required=False, help_text='Receive messages when an engagement is added')
+    notification_engagement_delete = forms.BooleanField(label='Engagement deleted', required=False, help_text='Receive messages when an engagement is deleted')
+    notification_engagement_upcoming = forms.BooleanField(label='Upcoming added', required=False, help_text='Receive messages when an engagement is upcoming')
+    notification_engagement_stale = forms.BooleanField(label='Engagement stale', required=False, help_text='Receive messages when an engagement is stale')
+    notification_engagement_close = forms.BooleanField(label='Engagement closed', required=False, help_text='Receive messages when an engagement was closed')
+    notification_engagement_reopen = forms.BooleanField(label='Engagement reopened', required=False, help_text='Receive messages when an engagement was reopened')
+    notification_engagement_auto_close = forms.BooleanField(label='Engagement auto-closed', required=False, help_text='Receive messages when an engagement was auto-closed')
+    notification_test_add = forms.BooleanField(label='Test added', required=False, help_text='Receive messages when a test is added')
+    notification_test_delete = forms.BooleanField(label='Test deleted', required=False, help_text='Receive messages when a test was deleted')
+    notification_product_add = forms.BooleanField(label='Product added', required=False, help_text='Receive messages when a product is added')
+    notification_product_delete = forms.BooleanField(label='Engagement deleted', required=False, help_text='Receive messages when a product was deleted')
+    notification_finding_add = forms.BooleanField(label='Finding added', required=False, help_text='Receive messages when a finding is added')
+    notification_finding_close = forms.BooleanField(label='Finding closed', required=False, help_text='Receive messages when a finding is closed')
+    notification_finding_delete = forms.BooleanField(label='Finding deleted', required=False, help_text='Receive messages when a finding is deleted')
+    notification_finding_reopen = forms.BooleanField(label='Finding reopened', required=False, help_text='Receive messages when a finding is reopened')
+    notification_review_requested = forms.BooleanField(label='Review requested', required=False, help_text='Receive messages when a review is requested')
+    notification_review_codereview = forms.BooleanField(label='Codereview requested', required=False, help_text='Receive messages when a manual code review is requested')
+    notification_scan_add = forms.BooleanField(label='Scan added', required=False, help_text='Receive messages when a scan is added')
+    notification_jira_update = forms.BooleanField(label='JIRA updates', required=False, help_text='Receive messages about a jira updates')
     class Meta:
         model = SlackNotifications
         exclude = ['']
